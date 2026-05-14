@@ -19,7 +19,7 @@ ALLOWED_ORIGINS = [
 ]
 
 API_KEY_NAME = "x-api-key"
-VALID_API_KEY = (os.getenv("API_KEY") or "").strip()
+VALID_API_KEY = ftapi-access
 
 LOCAL_ORIGINS = {
     "http://localhost:3000",
