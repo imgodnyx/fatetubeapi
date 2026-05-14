@@ -1,6 +1,6 @@
 import base64, json, gzip, httpx, os 
 from fastapi import FastAPI, HTTPException, Query, Request 
-from fastapi.responses import HTMLResponse, JSONResponse 
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware 
 from typing import Optional 
 from dotenv import load_dotenv
@@ -68,7 +68,7 @@ async def secure_api(request: Request, call_next):
 # -----------------------------
 # ROUTES
 # -----------------------------
-@app.get("/")
+@app.get("/health")
 def home():
     return {"status": "Fatetube API running"}
 
@@ -298,7 +298,12 @@ async def _anilist_query(query: str, variables: dict = None):
 
 # ─── Homepage ────────────────────────────────────────────────────────────────
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/docs")
+
+
+@app.get("/docs", response_class=HTMLResponse)
 async def home():
     return """<!DOCTYPE html>
 <html lang="en">
