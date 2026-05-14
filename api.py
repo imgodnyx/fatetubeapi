@@ -1,29 +1,34 @@
 import base64, json, gzip, httpx, os
-from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = FastAPI(title="Fatetube Api", version="1.0")
+app = FastAPI(title="Fatetube API", version="1.0")
 
-# --- Security Configuration ---
+# -----------------------------
+# CONFIG
+# -----------------------------
 ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
     if origin.strip()
 ]
 
+API_KEY_NAME = "x-api-key"
+VALID_API_KEY = (os.getenv("API_KEY") or "").strip()
+
+# local dev auto-trusted
 LOCAL_ORIGINS = {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 }
 
-API_KEY_NAME = "x-api-key"
-VALID_API_KEY = os.getenv("API_KEY")
-
+# -----------------------------
+# CORS
+# -----------------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -32,63 +37,48 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# -----------------------------
+# SECURITY MIDDLEWARE
+# -----------------------------
 @app.middleware("http")
 async def secure_api(request: Request, call_next):
-    # Public routes
-    PUBLIC_PATHS = {
-        "/",
-        "/docs",
-        "/redoc",
-        "/openapi.json",
-    }
+    PUBLIC_PATHS = {"/", "/docs", "/redoc", "/openapi.json"}
 
     if request.url.path in PUBLIC_PATHS:
         return await call_next(request)
 
     origin = request.headers.get("origin", "")
-    referer = request.headers.get("referer", "")
     api_key = request.headers.get(API_KEY_NAME)
 
-    # --------------------------------------------------
-    # Allow localhost/dev without API key
-    # --------------------------------------------------
+    # -------------------------
+    # 1. TRUSTED ORIGINS (NO API KEY REQUIRED)
+    # -------------------------
     if origin in LOCAL_ORIGINS or any(
-        referer.startswith(local) for local in LOCAL_ORIGINS
+        origin.startswith(allowed) for allowed in ALLOWED_ORIGINS
     ):
         return await call_next(request)
 
-    # --------------------------------------------------
-    # Allow valid API key
-    # --------------------------------------------------
+    # -------------------------
+    # 2. EVERYTHING ELSE REQUIRES API KEY
+    # -------------------------
     if VALID_API_KEY and api_key == VALID_API_KEY:
         return await call_next(request)
 
-    # --------------------------------------------------
-    # Allow approved production origins
-    # --------------------------------------------------
-    is_allowed_origin = any(
-        origin.startswith(allowed)
-        for allowed in ALLOWED_ORIGINS
-    )
-
-    is_allowed_referer = any(
-        referer.startswith(allowed)
-        for allowed in ALLOWED_ORIGINS
-    )
-
-    if is_allowed_origin or is_allowed_referer:
-        return await call_next(request)
-
-    # --------------------------------------------------
-    # Block everything else
-    # --------------------------------------------------
     return JSONResponse(
         status_code=403,
-        content={
-            "detail": "Access forbidden: Invalid origin, referer, or API key."
-        },
+        content={"detail": "Forbidden: invalid origin or API key"}
     )
+
+# -----------------------------
+# TEST ROUTE
+# -----------------------------
+@app.get("/health")
+def home():
+    return {"status": "Fatetube API running"}
+
+@app.get("/ping")
+def ping():
+    return {"pong": True}
     
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "Referer": "https://www.miruro.tv/"}
 ANILIST_URL = "https://graphql.anilist.co"
