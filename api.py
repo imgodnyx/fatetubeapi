@@ -280,14 +280,13 @@ async def home():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Miruro API v2.0</title>
+    <title>Fatetube Api v1.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: all 0.3s ease; }
         body { background: radial-gradient(circle at top, #0f172a, #020617); color: #e2e8f0; min-height: 100vh; padding: 50px 20px; }
         .container { max-width: 960px; margin: 0 auto; background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); padding: 40px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .header { text-align: center; margin-bottom: 50px; }
-        .logo { width: 120px; border-radius: 20px; box-shadow: 0 0 30px rgba(56, 189, 248, 0.3); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; object-fit: cover; }
         h1 { font-size: 3em; font-weight: 700; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; color: transparent; margin-bottom: 10px; }
         .subtitle { color: #94a3b8; font-size: 1.1em; font-weight: 300; }
         .version { display: inline-block; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 4px 14px; border-radius: 20px; font-size: 0.85em; margin-top: 10px; border: 1px solid rgba(56, 189, 248, 0.2); }
@@ -321,10 +320,9 @@ async def home():
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://www.miruro.to/icon-512x512.png" alt="Logo" class="logo">
-            <h1>Miruro Native API</h1>
+            <h1>Fatetube Api</h1>
             <div class="subtitle">Decrypted, bypassed, and reverse-engineered anime streaming API</div>
-            <div class="version">v2.0 — Full Data &amp; Pagination</div>
+            <div class="version">v1.0 — Full Data &amp; Pagination</div>
         </div>
 
         <div class="note" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.2); color: #10b981;">
