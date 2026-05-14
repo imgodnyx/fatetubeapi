@@ -1,12 +1,10 @@
-<div align="center">
-  <img src="https://www.miruro.to/icon-512x512.png" alt="Miruro API" width="150" style="border-radius: 20%; box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);">
-  <br><br>
+
+  # Fatetube API v1.0
   
-  # Miruro API v2.0
+  **The ultimate, decrypted, and fully reverse-engineered native Python backend for fatetube.**
   
-  **The ultimate, decrypted, and fully reverse-engineered native Python backend for Miruro.**
-  
-  [https://github.com/walterwhite-69/Miruro-API](https://github.com/walterwhite-69/Miruro-API)
+  [Fatetube app](https://fatetube.xyz)
+  [Fatetube netlify app](https://fatetube.netlify.app)
 </div>
 
 <br>
@@ -177,23 +175,3 @@ Feed `streams[0].url` into any HLS player (Video.js, hls.js, VLC, mpv). Subtitle
 
 <br>
 
-## Setup
-
-```bash
-git clone https://github.com/walterwhite-69/Miruro-API.git
-cd Miruro-API
-pip install -r requirements.txt  
-uvicorn api:app --host 0.0.0.0 --port 8000
-```
-
-Then open `http://localhost:8000/` for interactive API docs.
-
-<br>
-
-## Disclaimer
-
-This project is for educational purposes and API integrity research only. The author takes absolutely zero responsibility for network usage. Code contains zero skiddable artifacts.
-
-<br>
-
-**Author:** Walter | **GitHub:** [walterwhite-69](https://github.com/walterwhite-69)
