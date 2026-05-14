@@ -1,7 +1,8 @@
-import base64, json, gzip, httpx, os
-from fastapi import FastAPI, HTTPException, Request, Query
-from fastapi.responses import JSONResponse, HTMLResponse
-from fastapi.middleware.cors import CORSMiddleware
+import base64, json, gzip, httpx, os 
+from fastapi import FastAPI, HTTPException, Query, Request 
+from fastapi.responses import HTMLResponse, JSONResponse 
+from fastapi.middleware.cors import CORSMiddleware 
+from typing import Optional 
 from dotenv import load_dotenv
 
 load_dotenv()
