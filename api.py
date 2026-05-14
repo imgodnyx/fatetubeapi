@@ -7,10 +7,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app = FastAPI(title="Miruro API", version="2.0")
+app = FastAPI(title="Fatetube Api", version="1.0")
 
 # --- Security Configuration ---
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "").split(",")
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+LOCAL_ORIGINS = {
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+}
+
 API_KEY_NAME = "x-api-key"
 VALID_API_KEY = os.getenv("API_KEY")
 
@@ -22,35 +32,64 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.middleware("http")
 async def secure_api(request: Request, call_next):
-    # Allow home page (docs) without restrictions
-    if request.url.path in ["/", "/docs", "/redoc", "/openapi.json"]:
+    # Public routes
+    PUBLIC_PATHS = {
+        "/",
+        "/docs",
+        "/redoc",
+        "/openapi.json",
+    }
+
+    if request.url.path in PUBLIC_PATHS:
         return await call_next(request)
 
-    # 1. Check API Key
+    origin = request.headers.get("origin", "")
+    referer = request.headers.get("referer", "")
     api_key = request.headers.get(API_KEY_NAME)
+
+    # --------------------------------------------------
+    # Allow localhost/dev without API key
+    # --------------------------------------------------
+    if origin in LOCAL_ORIGINS or any(
+        referer.startswith(local) for local in LOCAL_ORIGINS
+    ):
+        return await call_next(request)
+
+    # --------------------------------------------------
+    # Allow valid API key
+    # --------------------------------------------------
     if VALID_API_KEY and api_key == VALID_API_KEY:
         return await call_next(request)
 
-    # 2. Check Origin or Referer
-    origin = request.headers.get("origin")
-    referer = request.headers.get("referer")
+    # --------------------------------------------------
+    # Allow approved production origins
+    # --------------------------------------------------
+    is_allowed_origin = any(
+        origin.startswith(allowed)
+        for allowed in ALLOWED_ORIGINS
+    )
 
-    is_allowed = False
-    for allowed in ALLOWED_ORIGINS:
-        if (origin and origin.startswith(allowed)) or (referer and referer.startswith(allowed)):
-            is_allowed = True
-            break
-            
-    if not is_allowed:
-        return JSONResponse(
-            status_code=403,
-            content={"detail": "Access forbidden: Invalid Origin, Referer, or API Key."}
-        )
+    is_allowed_referer = any(
+        referer.startswith(allowed)
+        for allowed in ALLOWED_ORIGINS
+    )
 
-    return await call_next(request)
+    if is_allowed_origin or is_allowed_referer:
+        return await call_next(request)
 
+    # --------------------------------------------------
+    # Block everything else
+    # --------------------------------------------------
+    return JSONResponse(
+        status_code=403,
+        content={
+            "detail": "Access forbidden: Invalid origin, referer, or API key."
+        },
+    )
+    
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "Referer": "https://www.miruro.tv/"}
 ANILIST_URL = "https://graphql.anilist.co"
 MIRURO_PIPE_URL = "https://www.miruro.tv/api/secure/pipe"
