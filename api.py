@@ -82,7 +82,7 @@ def home():
 
 @app.get("/ping")
 def ping():
-    return ping()
+    return {"ping": "pong"}
     
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "Referer": "https://www.miruro.tv/"}
 ANILIST_URL = "https://graphql.anilist.co"
