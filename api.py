@@ -1,6 +1,6 @@
 import base64, json, gzip, httpx, os
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
@@ -20,7 +20,6 @@ ALLOWED_ORIGINS = [
 API_KEY_NAME = "x-api-key"
 VALID_API_KEY = (os.getenv("API_KEY") or "").strip()
 
-# local dev auto-trusted
 LOCAL_ORIGINS = {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -50,17 +49,13 @@ async def secure_api(request: Request, call_next):
     origin = request.headers.get("origin", "")
     api_key = request.headers.get(API_KEY_NAME)
 
-    # -------------------------
-    # 1. TRUSTED ORIGINS (NO API KEY REQUIRED)
-    # -------------------------
+    # 1. Trusted origins (no API key needed)
     if origin in LOCAL_ORIGINS or any(
         origin.startswith(allowed) for allowed in ALLOWED_ORIGINS
     ):
         return await call_next(request)
 
-    # -------------------------
-    # 2. EVERYTHING ELSE REQUIRES API KEY
-    # -------------------------
+    # 2. API key required for everything else
     if VALID_API_KEY and api_key == VALID_API_KEY:
         return await call_next(request)
 
@@ -70,15 +65,15 @@ async def secure_api(request: Request, call_next):
     )
 
 # -----------------------------
-# TEST ROUTE
+# ROUTES
 # -----------------------------
-@app.get("/health")
+@app.get("/")
 def home():
     return {"status": "Fatetube API running"}
 
 @app.get("/ping")
 def ping():
-    return {"pong": True}
+    return ping()
     
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "Referer": "https://www.miruro.tv/"}
 ANILIST_URL = "https://graphql.anilist.co"
