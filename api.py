@@ -505,8 +505,7 @@ async def home():
         <div class="footer">
             All collection endpoints return paginated responses: <span style="color: #a5b4fc; font-family: monospace;">{ page, perPage, total, hasNextPage, results[] }</span>
             <br><br>
-            Developed by Walter | <a href="https://github.com/walterwhite-69" target="_blank">github.com/walterwhite-69</a>
-        </div>
+            Developed by imgodnyx | Credits to Walter on github for most of the code
     </div>
 </body>
 </html>"""
