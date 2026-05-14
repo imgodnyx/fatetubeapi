@@ -20,7 +20,7 @@ ALLOWED_ORIGINS = {
 }
 
 API_KEY_NAME = "x-api-key"
-VALID_API_KEY = "ftapi-access"
+VALID_API_KEY = ""
 
 # -----------------------------
 # CORS
