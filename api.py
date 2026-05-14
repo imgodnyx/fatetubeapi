@@ -1066,9 +1066,9 @@ if __name__ == "__main__":
 ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚══════╝   ╚═╝    ╚═════╝ ╚═════╝ ╚══════╝
                [ API v1.0 ]
     """
-log.info(banner)
-log.info("HttpClient ready, service is alive")
-log.info("Welcome to Fatetube api")
 
+    log.info(banner)
+    log.info("HttpClient ready, service is alive")
+    log.info("Welcome to Fatetube api")
 
 
