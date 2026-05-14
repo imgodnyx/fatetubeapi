@@ -10,28 +10,24 @@ load_dotenv()
 app = FastAPI(title="Fatetube API", version="1.0")
 
 # -----------------------------
-# CONFIG
+# HARD-CODED CONFIG
 # -----------------------------
-ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
-    if origin.strip()
-]
-
-API_KEY_NAME = "x-api-key"
-VALID_API_KEY = "ftapi-access"
-
-LOCAL_ORIGINS = {
+ALLOWED_ORIGINS = {
+    "https://fatetube.xyz",
+    "https://fatetube.netlify.app",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 }
+
+API_KEY_NAME = "x-api-key"
+VALID_API_KEY = "ftapi-access"
 
 # -----------------------------
 # CORS
 # -----------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=list(ALLOWED_ORIGINS),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,27 +38,39 @@ app.add_middleware(
 # -----------------------------
 @app.middleware("http")
 async def secure_api(request: Request, call_next):
-    PUBLIC_PATHS = {"/", "/docs", "/redoc", "/openapi.json"}
+    PUBLIC_PATHS = {
+        "/",
+        "/health",
+        "/redoc",
+        "/openapi.json",
+        "/ping",
+    }
 
+    # allow public routes
     if request.url.path in PUBLIC_PATHS:
         return await call_next(request)
 
     origin = request.headers.get("origin", "")
-    api_key = request.headers.get(API_KEY_NAME)
+    api_key = request.headers.get(API_KEY_NAME, "")
 
-    # 1. Trusted origins (no API key needed)
-    if origin in LOCAL_ORIGINS or any(
-        origin.startswith(allowed) for allowed in ALLOWED_ORIGINS
-    ):
+    # -----------------------------------
+    # TRUSTED WEBSITE ORIGINS
+    # no API key required
+    # -----------------------------------
+    if origin in ALLOWED_ORIGINS:
         return await call_next(request)
 
-    # 2. API key required for everything else
-    if VALID_API_KEY and api_key == VALID_API_KEY:
+    # -----------------------------------
+    # EVERYONE ELSE NEEDS API KEY
+    # -----------------------------------
+    if api_key == VALID_API_KEY:
         return await call_next(request)
 
     return JSONResponse(
         status_code=403,
-        content={"detail": "Forbidden: invalid origin or API key"}
+        content={
+            "detail": "Forbidden: valid origin or API key required"
+        },
     )
 
 # -----------------------------
