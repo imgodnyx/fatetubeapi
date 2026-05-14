@@ -298,12 +298,12 @@ async def _anilist_query(query: str, variables: dict = None):
 
 # ─── Homepage ────────────────────────────────────────────────────────────────
 
-@app.get("/")
+@app.get("/docs")
 async def root():
-    return RedirectResponse(url="/docs")
+    return RedirectResponse(url="/")
 
 
-@app.get("/docs", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 async def home():
     return """<!DOCTYPE html>
 <html lang="en">
