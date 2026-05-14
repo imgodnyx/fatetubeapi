@@ -4,6 +4,10 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware 
 from typing import Optional 
 from dotenv import load_dotenv
+import logging
+
+log = logging.getLogger("fatetube")
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
